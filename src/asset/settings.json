@@ -1,0 +1,6 @@
+{
+    "concurrency" : 10,
+    "entries" : [
+        "https://mysite.tld"
+    ]
+}
