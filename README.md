@@ -12,3 +12,4 @@ finalized.
 - [ ] Add CLI interactions
 - [ ] Add database relational model to store the crawled Pages
 - [ ] Add RESTful API to provide data from said database
+- [ ] Don't recheck the same URL with different protocol
