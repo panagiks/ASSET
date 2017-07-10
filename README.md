@@ -1,5 +1,5 @@
 # ASSET
-ASyncronus Spidering Exhibition Tool (ASSET).
+ASynchronous Spidering Essential Tool (ASSET). 
 
 # Status
 
