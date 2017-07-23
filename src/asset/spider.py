@@ -196,6 +196,7 @@ class Crawler(object):
         await asyncio.gather(*tasks)
 
 
-loop = asyncio.get_event_loop()
-c = Crawler(loop)
-loop.run_until_complete(c.start())
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    c = Crawler(loop)
+    loop.run_until_complete(c.start())
