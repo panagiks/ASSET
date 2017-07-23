@@ -4,7 +4,6 @@ import aiohttp
 import json
 
 from collections import MutableSequence
-# from tld import get_tld
 from yarl import URL
 from bs4 import BeautifulSoup
 
@@ -34,11 +33,11 @@ class Page(object):
         else:
             raise TypeError("Can't compare apples to oranges")
 
-    def __str__(self):
-        return self.url
-
     def __repr__(self):
         return "<{} object: {}>".format(self.__class__.__name__, self.url)
+
+    def __str__(self):
+        return self.url
 
     def __len__(self):
         return len(self.index)
@@ -165,7 +164,7 @@ class Target(object):
             el if el.is_absolute() else URL.join(self.domain.url, el)
             for el in next_tasks
         ]
-        # Remove non HTTP/HTTPS entries ... we won't be using the tel proto :p
+        # Remove non HTTP/HTTPS entries ... we won't be using the tel: proto :p
         next_tasks = filter(
             lambda el: el.scheme in ["http", "https"], next_tasks
         )
