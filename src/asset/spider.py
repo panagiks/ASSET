@@ -77,6 +77,7 @@ class Page(object):
 
 class Domain(MutableSequence):
     def __init__(self, url_obj):
+        assert isinstance(url_obj, URL)
         super().__init__()
         self.object = url_obj
         self.name = url_obj.host
@@ -120,7 +121,7 @@ class Domain(MutableSequence):
         return self._list[pos]
 
     def __setitem__(self, pos, value):
-        self._list.key[pos] = value
+        self._list[pos] = value
 
     def append(self, value):
         return self._list.append(value)
@@ -162,11 +163,11 @@ class Target(object):
             lambda el: el.host == self.domain.name or not el.is_absolute(),
             map(lambda el: URL(el), res)
         )
-        # Fix relative URLs
-        next_tasks = [
+        # Fix relative URLs, re-filter with full paths :)
+        next_tasks = set([
             el if el.is_absolute() else URL.join(self.domain.url, el)
             for el in next_tasks
-        ]
+        ])
         # Remove non HTTP/HTTPS entries ... we won't be using the tel: proto :p
         next_tasks = filter(
             lambda el: el.scheme in ["http", "https"], next_tasks
