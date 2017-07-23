@@ -64,9 +64,9 @@ class Page(object):
         self.index = set(filter(lambda el: el, soup))
 
     async def extract(self):
-        if any(map(lambda el: el is None, [Page.semaphore, Page.loop])):
+        if any(map(lambda el: el is None, [self.semaphore, self.loop])):
             raise UnboundLocalError("Initialize Class-wide variables!")
-        with (await Page.semaphore):
+        with (await self.semaphore):
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.url) as resp:
                     data = await resp.text()
