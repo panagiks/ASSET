@@ -14,6 +14,8 @@ class Page(object):
 
     def __init__(self, url):
         assert isinstance(url, str)
+        if any(map(lambda el: el is None, [self.semaphore, self.loop])):
+            raise AttributeError("Initialize Class-wide variables!")
         self.url = url
         self.index = []
 
@@ -64,8 +66,6 @@ class Page(object):
         self.index = set(filter(lambda el: el, soup))
 
     async def extract(self):
-        if any(map(lambda el: el is None, [self.semaphore, self.loop])):
-            raise UnboundLocalError("Initialize Class-wide variables!")
         with (await self.semaphore):
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.url) as resp:
