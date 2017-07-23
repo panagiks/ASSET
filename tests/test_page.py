@@ -8,6 +8,23 @@ a_url = "https://example.com"
 
 class TestPage(unittest.TestCase):
 
+    def setUp(self):
+        super().setUp()
+        Page.semaphore = asyncio.Semaphore(10)
+        Page.loop = asyncio.get_event_loop()
+
+    @raises(AttributeError)
+    def test_init_validation_loop(self):
+        Page.loop = None
+        _ = Page(a_url)
+        Page.loop = asyncio.get_event_loop()
+
+    @raises(AttributeError)
+    def test_init_validation_semaphore(self):
+        Page.semaphore = None
+        _ = Page(a_url)
+        Page.semaphore = asyncio.Semaphore(10)
+
     @raises(AssertionError)
     def test_init_validation_int(self):
         _ = Page(42)
