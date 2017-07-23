@@ -59,6 +59,8 @@ class TestPage(unittest.TestCase):
                 <a href=\"https://example.com/index#join\">yada</a>
                 <a href=\"index#join\">yada</a>
                 <a href=\"index#yada\">yada</a>
+                <a>???</a>
+                <meta></meta>
             """
             await p1.soupify(body)
             # This happens bc of relative paths; they are filtered in Target
