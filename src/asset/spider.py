@@ -55,10 +55,13 @@ class Page(object):
             print("\t", el)
 
     async def soupify(self, html):
-        soup = BeautifulSoup(html, 'html.parser')
-        soup = filter(lambda el: 'href' in el.attrs, soup.find_all('a'))
-        soup = [link['href'] for link in soup]
-        self.index = list(filter(lambda el: not el.startswith('#'), soup))
+        soup = BeautifulSoup(html, 'html.parser').find_all('a')
+        soup = map(
+            lambda el: el['href'].split('#')[0] if 'href' in el.attrs else None,
+            soup
+        )
+        #  Use 'set' instead of 'list' to deduplicate
+        self.index = set(filter(lambda el: el, soup))
 
     async def extract(self):
         if any(map(lambda el: el is None, [Page.semaphore, Page.loop])):
