@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 from nose.tools import raises, with_setup
-from asset.spider import Page
+from asset.spider import Page, soupify
 
 a_url = "https://example.com"
 
@@ -79,7 +79,7 @@ class TestPage(unittest.TestCase):
                 <a>???</a>
                 <meta></meta>
             """
-            await p1.soupify(body)
+            index = await soupify(body)
             # This happens bc of relative paths; they are filtered in Target
-            assert len(p1.index) == 5
+            assert len(index) == 5
         asyncio.get_event_loop().run_until_complete(go())

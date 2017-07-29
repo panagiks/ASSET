@@ -8,6 +8,16 @@ from yarl import URL
 from bs4 import BeautifulSoup
 
 
+async def soupify(html):
+    soup = BeautifulSoup(html, 'html.parser').find_all('a')
+    soup = map(
+        lambda el: el['href'].split('#')[0] if 'href' in el.attrs else None,
+        soup
+    )
+    #  Use 'set' instead of 'list' to deduplicate
+    return set(filter(lambda el: el, soup))
+
+
 class Page(object):
     semaphore = None
     loop = None
@@ -56,21 +66,12 @@ class Page(object):
         for el in self.index:
             print("\t", el)
 
-    async def soupify(self, html):
-        soup = BeautifulSoup(html, 'html.parser').find_all('a')
-        soup = map(
-            lambda el: el['href'].split('#')[0] if 'href' in el.attrs else None,
-            soup
-        )
-        #  Use 'set' instead of 'list' to deduplicate
-        self.index = set(filter(lambda el: el, soup))
-
     async def extract(self):
         with (await self.semaphore):
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.url) as resp:
                     data = await resp.text()
-        await self.soupify(data)
+        self.index = await self.soupify(data)
         await self.dump()
         return self.index
 
