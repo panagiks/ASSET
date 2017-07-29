@@ -71,8 +71,8 @@ class Page(object):
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.url) as resp:
                     data = await resp.text()
-        self.index = await self.soupify(data)
         await self.dump()
+        self.index = await soupify(data)
         return self.index
 
 
@@ -192,12 +192,48 @@ class Crawler(object):
 
     async def start(self):
         entries = self.settings['entries']
-        targets = [Target(entry) for entry in entries]
-        tasks = [target.start() for target in targets]
+        self.targets = [Target(entry) for entry in entries]
+        tasks = [target.start() for target in self.targets]
         await asyncio.gather(*tasks)
+
+    def dump(self):
+        import jsonpickle
+        crawl_dump = {
+            eo['name']: [
+                {'url': ei['url'], 'index': ei['index']['py/set']}
+                for ei in eo['_list']
+            ]
+            for eo in map(
+                lambda el: json.loads(jsonpickle.encode(el.domain)),
+                self.targets
+            )
+        }
+        return crawl_dump
+
+    def graph(self):
+        import networkx as nx
+        data = self.dump()
+        g = nx.DiGraph()
+        for domain in data:
+            for page in data[domain]:
+                g.add_edge(domain, page['url'])
+                for link in page['index']:
+                    g.add_edge(page['url'], link)
+        p = nx.nx_agraph.to_agraph(g)
+        p.graph_attr.update(
+            landscape='false', ranksep='3.0', fontcolor='white',
+            bgcolor='#333333', label='ASSE - Async Spider => Graph Report'
+        )
+        p.node_attr.update(
+            shape='hexagon', fontcolor='white', color='white', style='filled',
+            fillcolor='#006699'
+        )
+        p.edge_attr.update(color='white')
+        p.draw(path='ig1', format='png', prog='dot')
 
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     c = Crawler(loop)
     loop.run_until_complete(c.start())
+    c.graph()

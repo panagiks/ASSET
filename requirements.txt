@@ -1,2 +1,10 @@
 aiohttp==2.2.3
 bs4==0.0.1
+# Required by Crawler.dump()
+jsonpickle==0.9.5
+############################
+# Required by Crawler.graph()
+networkx==1.11
+pygraphviz==1.3.1
+# Also needs graphviz and graphviz-dev installed system wide
+############################
