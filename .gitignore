@@ -100,4 +100,4 @@ ENV/
 # mypy
 .mypy_cache/
 
-src/asset/settings.json
+src/async_spider/settings.json
