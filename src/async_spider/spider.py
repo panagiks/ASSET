@@ -2,6 +2,7 @@
 import asyncio
 import aiohttp
 import json
+import click
 
 from collections import MutableSequence
 from yarl import URL
@@ -159,7 +160,7 @@ class Target(object):
         if entry not in self.domain:
             self.domain.append(entry)
         res = await entry.extract()
-        # Filter egress URLs and cast resulrs to URL objects
+        # Filter egress URLs and cast results to URL objects
         next_tasks = filter(
             lambda el: el.host == self.domain.name or not el.is_absolute(),
             map(lambda el: URL(el), res)
@@ -183,9 +184,12 @@ class Target(object):
 
 
 class Crawler(object):
-    def __init__(self, loop):
-        with open('settings.json') as settings_file:
-            self.settings = json.load(settings_file)
+    def __init__(self, loop, settings=False, concurrency=None, entries=None):
+        if settings:
+            with open('settings.json') as settings_file:
+                self.settings = json.load(settings_file)
+        else:
+            self.settings = {'concurrency': concurrency, 'entries': entries}
         Page.semaphore = asyncio.Semaphore(self.settings['concurrency'])
         Page.loop = loop
         self.loop = loop
@@ -232,8 +236,24 @@ class Crawler(object):
         p.draw(path='ig1', format='png', prog='dot')
 
 
-if __name__ == '__main__':
+@click.command()
+@click.option('-a', '--auto', 'settings', is_flag=True,
+              help='Read entries and concurrency from file.')
+@click.option('-c', '--concurrency', type=click.INT, default=10,
+              help='Number of concurrent connections.')
+@click.option('-e', '--entries', default='', multiple=True,
+              help='Entry point to crawl. (Reusable flag)')
+@click.option('-g', '--graph', is_flag=True, help='Export report in graph.')
+@click.argument('out', type=click.File('w'), default='', required=False)
+def main(settings, concurrency, entries, graph, out):
     loop = asyncio.get_event_loop()
-    c = Crawler(loop)
+    c = Crawler(loop, settings, concurrency, entries)
     loop.run_until_complete(c.start())
-    c.graph()
+    if graph:
+        c.graph()
+    if out:
+        click.echo(json.dumps(c.dump()), file=out)
+
+
+if __name__ == '__main__':
+    main()

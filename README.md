@@ -1,5 +1,5 @@
 # ASSET
-ASynchronous Spidering Essential Tool (ASSET). 
+ASynchronous Spidering Essential Tool (ASSET).
 
 # Status
 
@@ -9,7 +9,8 @@ finalized.
 
 # Todo
 
-- [ ] Add CLI interactions
+- [x] Add CLI interactions
 - [ ] Add database relational model to store the crawled Pages
 - [ ] Add RESTful API to provide data from said database
+- [ ] Create better looking (and maybe interactive) graphs
 - [ ] Don't recheck the same URL with different protocol
