@@ -72,7 +72,6 @@ class Page(object):
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.url) as resp:
                     data = await resp.text()
-        await self.dump()
         self.index = await soupify(data)
         return self.index
 
