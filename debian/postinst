@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+test $DEBIAN_SCRIPT_DEBUG && set -v -x
+
+export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
+
+case "$1" in
+configure)
+    ln -s /usr/share/async-spider/bin/async-spider /usr/bin/async-spider
+    ;;
+esac
+
+#DEBHELPER#

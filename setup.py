@@ -34,7 +34,9 @@ setup(
     },
     install_requires=[
         'aiohttp',
-        'bs4'
+        'bs4',
+        'jsonpickle',
+        'click'
     ],
     entry_points={
         'console_scripts': [

@@ -69,7 +69,8 @@ class Page(object):
 
     async def extract(self):
         with (await self.semaphore):
-            async with aiohttp.ClientSession() as session:
+            conn = aiohttp.TCPConnector(verify_ssl=False)
+            async with aiohttp.ClientSession(connector=conn) as session:
                 async with session.get(self.url) as resp:
                     data = await resp.text()
         self.index = await soupify(data)
@@ -158,7 +159,10 @@ class Target(object):
     async def crawl(self, entry):
         if entry not in self.domain:
             self.domain.append(entry)
-        res = await entry.extract()
+        try:
+            res = await entry.extract()
+        except:
+            return None
         # Filter egress URLs and cast results to URL objects
         next_tasks = filter(
             lambda el: el.host == self.domain.name or not el.is_absolute(),
@@ -171,7 +175,7 @@ class Target(object):
         ])
         # Remove non HTTP/HTTPS entries ... we won't be using the tel: proto :p
         next_tasks = filter(
-            lambda el: el.scheme in ["http", "https"], next_tasks
+            lambda el: el.scheme in ["http", "https"] and el.path.endswith('/') or el.path.endswith('html'), next_tasks
         )
         # Remove already crawled URLs and cast
         next_tasks = filter(
@@ -250,7 +254,7 @@ def main(settings, concurrency, entries, graph, out):
     loop.run_until_complete(c.start())
     if graph:
         c.graph()
-    if out:
+    if out.name:
         click.echo(json.dumps(c.dump()), file=out)
 
 
