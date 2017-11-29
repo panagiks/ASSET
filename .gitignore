@@ -101,3 +101,9 @@ ENV/
 .mypy_cache/
 
 src/async_spider/settings.json
+
+debian/async-spider/
+debian/*debhelper
+debian/async-spider.substvars
+debian/debhelper-build-stamp
+debian/files
